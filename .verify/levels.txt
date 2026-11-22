@@ -1,0 +1,23 @@
+Grand Museum
+  1. The Lobby          bot escaped with 8.05s left  [key:1 targets:0 doors:0 loot:4 void:0 idle:time]
+  2. Gallery of Glass   bot escaped with 5.95s left  [key:1 targets:0 doors:0 loot:5 void:0 idle:time]
+  3. Laser Hall         bot escaped with 5.15s left  [key:1 targets:0 doors:0 loot:7 void:0 idle:time]
+  4. The Vault Ring     bot escaped with 3.08s left  [key:1 targets:0 doors:0 loot:9 void:0 idle:time]
+  5. The Crown Jewel    bot escaped with 4.48s left  [key:1 targets:0 doors:0 loot:7 void:0 idle:time]
+Bank Vault
+  1. Front Counter      bot escaped with 4.77s left  [key:1 targets:1 doors:1 loot:7 void:0 idle:time]
+  2. Deposit Hall       bot escaped with 4.57s left  [key:1 targets:1 doors:1 loot:7 void:0 idle:time]
+  3. The Main Vault     bot escaped with 5.07s left  [key:1 targets:1 doors:2 loot:7 void:0 idle:guard]
+Neon Casino
+  1. High Roller Floor  bot escaped with 3.97s left  [key:0 targets:3 doors:0 loot:4 void:0 idle:time]
+  2. Roulette Pit       bot escaped with 2.92s left  [key:0 targets:3 doors:0 loot:6 void:0 idle:time]
+City Rooftop
+  1. Skyline Dash       bot escaped with 6.47s left  [key:1 targets:0 doors:0 loot:3 void:14 idle:time]
+  2. Antenna Row        bot escaped with 5.82s left  [key:1 targets:0 doors:0 loot:5 void:28 idle:time]
+Secret Laboratory
+  1. Test Chamber       bot escaped with 4.45s left  [key:0 targets:2 doors:0 loot:4 void:22 idle:time]
+  2. Reactor Walk       bot escaped with 3.33s left  [key:0 targets:2 doors:0 loot:4 void:39 idle:guard]
+Space Vault
+  1. Orbital Vault      bot escaped with 8.05s left  [key:0 targets:1 doors:0 loot:6 void:0 idle:time]
+  2. Zero-G Core        bot escaped with 8.30s left  [key:0 targets:1 doors:0 loot:6 void:0 idle:guard]
+ALL OK
