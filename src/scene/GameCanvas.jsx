@@ -27,7 +27,7 @@ function Reflections() {
 const DEVICE_DPR = typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1;
 const MAX_DPR = Math.min(DEVICE_DPR, 1.25);
 const MIN_DPR = Math.min(MAX_DPR, 0.7);
-const PIXEL_BUDGET = 1.5e6; // about 1890 x 1060 rendered pixels to start with
+const PIXEL_BUDGET = 1.2e6; // about 1460 x 820 rendered pixels to start with
 const STEP = 0.2;
 
 function initialDpr() {
@@ -110,6 +110,17 @@ function AdaptiveResolution({ scene, dpr, onChange, onFloor, hold }) {
   return null;
 }
 
+// Re-render the shadow map on every other frame only: the one-frame lag is invisible, and the
+// shadow pass (every caster drawn a second time) is one of the most expensive parts of a frame.
+function HalfRateShadows() {
+  const n = useRef(0);
+  useFrame(({ gl }) => {
+    gl.shadowMap.autoUpdate = false;
+    if (n.current++ % 2 === 0) gl.shadowMap.needsUpdate = true;
+  });
+  return null;
+}
+
 // Which 3D scene sits behind the UI for each screen.
 const SCENES = { title: 'title', worlds: 'worlds', levels: 'preview', briefing: 'preview' };
 
@@ -132,6 +143,7 @@ export function GameCanvas() {
       }}
     >
       <AdaptiveResolution scene={scene} dpr={dpr} onChange={setDpr} onFloor={actions.setLowGfx} hold={baking} />
+      <HalfRateShadows />
       <Reflections />
       {scene === 'title' && <TitleScene />}
       {scene === 'worlds' && <WorldSelectScene />}
