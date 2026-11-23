@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { sfx } from '../game/audio.js';
 import { readInput } from '../game/input.js';
@@ -96,8 +97,13 @@ function handle(e, world) {
   }
 }
 
+// The HUD clock is published to React 20 times a second instead of on every frame: each publish
+// re-renders the timer and re-lays-out the HUD, which on a 144 Hz screen was 144 DOM updates a second.
+const HUD_INTERVAL = 0.05;
+
 // Advances the game world once per rendered frame while the game is in the "playing" state.
 export function Simulation({ world }) {
+  const sinceHud = useRef(HUD_INTERVAL);
   useFrame((_, rawDt) => {
     if (getState().screen !== 'playing' || world.over) return;
     const dt = Math.min(rawDt, 0.05);
@@ -108,8 +114,14 @@ export function Simulation({ world }) {
     step(world, dt, input, events);
     for (const e of events) handle(e, world);
     if (getState().screen === 'playing') {
+      sinceHud.current += dt;
+      const s = getState();
+      const timeLeft = Math.max(0, world.timeLeft);
+      // the last three seconds (countdown beeps) and the final zero are never delayed
+      const tick = sinceHud.current >= HUD_INTERVAL || timeLeft === 0 || Math.ceil(timeLeft) !== Math.ceil(s.timeLeft);
+      if (tick) sinceHud.current = 0;
       setState({
-        timeLeft: Math.max(0, world.timeLeft),
+        timeLeft: tick ? timeLeft : s.timeLeft,
         alarm: world.alarm > 0,
         smoke: world.smokeCharges,
         hidden: world.player.hidden,

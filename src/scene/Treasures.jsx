@@ -1,11 +1,13 @@
-import { useMemo, useRef } from 'react';
+import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { FloorGlow } from './Models.jsx';
 import { Bullion, Core, GoldenChip, KEYS, LOOT, LOOT_COLOR, Terminal } from './ModelsExtra.jsx';
-import { glow, std } from './env/materials.js';
+import { ghost, std } from './env/materials.js';
+import { useOwned } from './useOwned.js';
 
 const pedestalGeo = new THREE.CylinderGeometry(0.34, 0.42, 0.3, 8);
+const markerGeo = new THREE.CylinderGeometry(0.05, 0.4, 4.4, 10, 1, true);
 const pedestalMat = new THREE.MeshStandardMaterial({ color: '#161b3a', roughness: 0.4, metalness: 0.5 });
 
 function Item({ item, skin }) {
@@ -53,11 +55,12 @@ function Key({ item, model, color }) {
   });
   return (
     <group ref={root} position={[item.x, 0, item.z]}>
-      <FloorGlow color={color} size={3.4} />
+      {/* glow disc instead of a real light: every extra point light is paid for by every pixel,
+          and hiding one on pickup would recompile every shader mid-run */}
+      <FloorGlow color={color} size={4.4} />
       <group ref={spin}>
         <Model scale={1.35} rotation={[0, 0, model === 'card' ? 0.2 : 0.5]} />
       </group>
-      <pointLight color={color} intensity={8} distance={5} position={[0, 1.2, 0]} />
     </group>
   );
 }
@@ -67,7 +70,7 @@ function Target({ target, kind, accent }) {
   const root = useRef();
   const spin = useRef();
   const beam = useRef();
-  const screenMat = useMemo(() => new THREE.MeshBasicMaterial({ color: '#ff3a4d', toneMapped: false }), []);
+  const screenMat = useOwned(() => new THREE.MeshBasicMaterial({ color: '#ff3a4d', toneMapped: false }), []);
   useFrame((state) => {
     const t = state.clock.elapsedTime;
     if (kind === 'terminal') {
@@ -86,12 +89,9 @@ function Target({ target, kind, accent }) {
   });
   return (
     <group ref={root} position={[target.x, 0, target.z]}>
-      <FloorGlow color={accent} size={4} />
+      <FloorGlow color={accent} size={5} />
       {/* tall marker beam so the objective reads from across the room */}
-      <mesh ref={beam} position={[0, 2.4, 0]}>
-        <cylinderGeometry args={[0.05, 0.4, 4.4, 10, 1, true]} />
-        <meshBasicMaterial color={accent} transparent opacity={0.16} depthWrite={false} blending={THREE.AdditiveBlending} toneMapped={false} side={THREE.DoubleSide} />
-      </mesh>
+      <mesh ref={beam} geometry={markerGeo} material={ghost(accent, 0.16)} position={[0, 2.4, 0]} />
       {kind === 'bullion' && <Bullion />}
       {kind === 'terminal' && <Terminal screenMat={screenMat} />}
       {(kind === 'chip' || kind === 'core') && (
@@ -99,7 +99,6 @@ function Target({ target, kind, accent }) {
           {kind === 'chip' ? <GoldenChip /> : <Core />}
         </group>
       )}
-      <pointLight color={accent} intensity={7} distance={5} position={[0, 1.6, 0]} />
     </group>
   );
 }
@@ -118,7 +117,7 @@ function Exit({ world }) {
   const ring = useRef();
   const light = useRef();
   const helipad = world.theme.exit === 'helipad';
-  const { glowMat, beamMat } = useMemo(
+  const { glowMat, beamMat } = useOwned(
     () => ({
       glowMat: new THREE.MeshBasicMaterial({ color: LOCKED, toneMapped: false }),
       beamMat: new THREE.MeshBasicMaterial({

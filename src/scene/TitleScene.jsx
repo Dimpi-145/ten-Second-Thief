@@ -1,8 +1,10 @@
 import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
+import { useStore } from '../game/store.js';
 import { getFloorTexture } from '../game/textures.js';
 import { Diamond, FloorGlow, GoldStack, KeyModel } from './Models.jsx';
+import { useOwned } from './useOwned.js';
 
 const beamGeo = new THREE.CylinderGeometry(0.03, 0.03, 1, 6);
 const sheathGeo = new THREE.CylinderGeometry(0.11, 0.11, 1, 8, 1, true);
@@ -32,10 +34,11 @@ const LASERS = [
 
 // Animated vault showpiece behind the title UI.
 export function TitleScene() {
+  const shadows = useStore((s) => !s.lowGfx);
   const gem = useRef();
   const lasers = useRef();
   const orbit = useRef();
-  const tex = useMemo(() => {
+  const tex = useOwned(() => {
     const t = getFloorTexture().clone();
     t.repeat.set(20, 20);
     t.needsUpdate = true;
@@ -79,7 +82,7 @@ export function TitleScene() {
       <fog attach="fog" args={['#070818', 9, 30]} />
       <ambientLight intensity={0.7} color="#5560b8" />
       <hemisphereLight args={['#6a7cff', '#12061f', 0.6]} />
-      <directionalLight position={[5, 12, 6]} intensity={1.3} color="#aab8ff" castShadow shadow-mapSize={[1024, 1024]} />
+      <directionalLight position={[5, 12, 6]} intensity={1.3} color="#aab8ff" castShadow={shadows} shadow-mapSize={[1024, 1024]} />
       <pointLight position={[-5, 3, 3]} color="#00e5ff" intensity={90} distance={22} decay={1.7} />
       <pointLight position={[5, 3, -3]} color="#b14dff" intensity={90} distance={22} decay={1.7} />
       <pointLight position={[0, 4.6, 0]} color="#9ff3ff" intensity={30} distance={10} />

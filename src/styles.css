@@ -5,7 +5,7 @@
   --gold: #ffc531;
   --green: #2dffa0;
   --bg: #04050c;
-  --glass: rgba(14, 18, 44, 0.5);
+  --glass: rgba(11, 14, 36, 0.8);
   --glass-border: rgba(140, 200, 255, 0.22);
   --font: 'Orbitron', 'Rajdhani', 'Eurostile', 'Bahnschrift', 'Segoe UI', system-ui, -apple-system, sans-serif;
 }
@@ -60,7 +60,6 @@ body,
 }
 .scanlines {
   background: repeating-linear-gradient(to bottom, rgba(255, 255, 255, 0.022) 0 1px, transparent 1px 3px);
-  mix-blend-mode: overlay;
 }
 .alarm-flash {
   opacity: 0;
@@ -127,12 +126,12 @@ body,
 }
 
 /* ---------- shared ---------- */
+/* No backdrop-filter here on purpose: these panels sit on top of the live 3D canvas, so a blur
+   would have to be recomputed for every panel on every frame. A denser tint reads the same. */
 .glass {
   background: var(--glass);
   border: 1px solid var(--glass-border);
   border-radius: 14px;
-  backdrop-filter: blur(14px) saturate(140%);
-  -webkit-backdrop-filter: blur(14px) saturate(140%);
   box-shadow:
     0 8px 32px rgba(0, 0, 0, 0.45),
     inset 0 1px 0 rgba(255, 255, 255, 0.09);
@@ -221,8 +220,6 @@ kbd {
   color: #e8f1ff;
   font-size: 15px;
   cursor: pointer;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
   transition:
     border-color 0.2s,
     box-shadow 0.2s;
@@ -300,7 +297,6 @@ kbd {
   color: var(--red);
   -webkit-text-fill-color: var(--red);
   opacity: 0;
-  mix-blend-mode: screen;
   animation: glitch 4.5s steps(1) infinite;
 }
 @keyframes sheen {

@@ -7,6 +7,7 @@ import * as THREE from 'three';
 import { TILE, cellType } from '../../game/world.js';
 import { getLockerTexture, getPaintingTextures, rng } from '../../game/textures.js';
 import { ghost, glow, std } from './materials.js';
+import { useOwned } from '../useOwned.js';
 
 const box = new THREE.BoxGeometry(1, 1, 1);
 const cyl = new THREE.CylinderGeometry(1, 1, 1, 12);
@@ -102,7 +103,7 @@ function MuseumCase({ seed }) {
 }
 
 function MuseumDecor({ world }) {
-  const mats = useMemo(
+  const mats = useOwned(
     () => getPaintingTextures().map((t) => new THREE.MeshBasicMaterial({ map: t, color: '#b8b8c8' })),
     [],
   );
@@ -159,7 +160,7 @@ function BankDesk({ seed }) {
 }
 
 function BankDecor({ world }) {
-  const lockers = useMemo(() => new THREE.MeshStandardMaterial({ map: getLockerTexture(), roughness: 0.35, metalness: 0.7 }), []);
+  const lockers = useOwned(() => new THREE.MeshStandardMaterial({ map: getLockerTexture(), roughness: 0.35, metalness: 0.7 }), []);
   const brass = std('#c9a13a', 0.3, 0.9);
   return (
     <WallItems world={world} chance={0.42} seed={11} y={1.55}>
@@ -207,7 +208,7 @@ function CasinoPillar({ i }) {
 
 function SlotMachine({ seed }) {
   const screen = useRef();
-  const mat = useMemo(() => new THREE.MeshBasicMaterial({ color: '#ff2d95', toneMapped: false }), []);
+  const mat = useOwned(() => new THREE.MeshBasicMaterial({ color: '#ff2d95', toneMapped: false }), []);
   useFrame((state) => {
     const t = state.clock.elapsedTime * 2 + seed;
     mat.color.setHSL((t * 0.15) % 1, 1, 0.55 + Math.sin(t * 9) * 0.1);
@@ -399,7 +400,7 @@ function SpecimenTank({ seed }) {
 }
 
 function LabDecor({ world }) {
-  const screen = useMemo(() => new THREE.MeshBasicMaterial({ color: '#3dffb0', toneMapped: false }), []);
+  const screen = useOwned(() => new THREE.MeshBasicMaterial({ color: '#3dffb0', toneMapped: false }), []);
   useFrame((state) => {
     const t = state.clock.elapsedTime;
     screen.color.setRGB(0.1, 0.75 + Math.sin(t * 13) * 0.08 + Math.sin(t * 2.1) * 0.12, 0.55);

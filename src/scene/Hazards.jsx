@@ -1,7 +1,8 @@
-import { useMemo, useRef } from 'react';
+import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { CAM_HALF_ANGLE, CAM_RANGE } from '../game/simulation.js';
+import { useOwned } from './useOwned.js';
 
 // ---- Lasers ---------------------------------------------------------------------------------
 const beamGeo = new THREE.CylinderGeometry(0.035, 0.035, 1, 6);
@@ -19,7 +20,7 @@ function Laser({ l, colors }) {
   const root = useRef();
   const beams = useRef();
   const spin = l.type === 'spin';
-  const { coreMat, sheathMat, floorMat } = useMemo(() => {
+  const { coreMat, sheathMat, floorMat } = useOwned(() => {
     const soft = {
       color: colors[1], transparent: true, depthWrite: false,
       blending: THREE.AdditiveBlending, toneMapped: false,
@@ -90,7 +91,7 @@ const ALERT = new THREE.Color('#ff1a3c');
 
 function SecurityCamera({ cam, world }) {
   const pivot = useRef();
-  const { fanMat, ledMat } = useMemo(
+  const { fanMat, ledMat } = useOwned(
     () => ({
       fanMat: new THREE.MeshBasicMaterial({
         color: SCAN, transparent: true, opacity: 0.2, depthWrite: false,

@@ -1,8 +1,9 @@
-import { useMemo, useRef } from 'react';
+import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { GUARD_HALF_ANGLE, GUARD_RANGE } from '../game/simulation.js';
 import { std } from './env/materials.js';
+import { useOwned } from './useOwned.js';
 
 const bodyGeo = new THREE.CylinderGeometry(0.32, 0.36, 0.8, 8);
 const headGeo = new THREE.IcosahedronGeometry(0.24, 1);
@@ -30,7 +31,7 @@ const HOSTILE = new THREE.Color('#ff1a3c');
 const SEARCH = new THREE.Color('#b14dff');
 
 function useAlertMaterials() {
-  return useMemo(
+  return useOwned(
     () => ({
       coneMat: new THREE.MeshBasicMaterial({
         color: CALM, transparent: true, opacity: 0.2, depthWrite: false,

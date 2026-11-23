@@ -1,7 +1,8 @@
-import { useLayoutEffect, useMemo, useRef } from 'react';
+import { useLayoutEffect, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { getGlowTexture, getWindowTexture, rng } from '../../game/textures.js';
+import { useOwned } from '../useOwned.js';
 
 const unitBox = new THREE.BoxGeometry(1, 1, 1);
 const planeGeo = new THREE.PlaneGeometry(1, 1);
@@ -23,7 +24,7 @@ function starGeometry(count, radius, upperOnly, seed) {
 }
 
 function Stars({ count, upperOnly, color = '#dfe8ff', size = 1.6 }) {
-  const geo = useMemo(() => starGeometry(count, 260, upperOnly, 77), [count, upperOnly]);
+  const geo = useOwned(() => starGeometry(count, 260, upperOnly, 77), [count, upperOnly]);
   return (
     <points geometry={geo} frustumCulled={false}>
       <pointsMaterial color={color} size={size} sizeAttenuation={false} fog={false} toneMapped={false} />
@@ -35,7 +36,7 @@ function Stars({ count, upperOnly, color = '#dfe8ff', size = 1.6 }) {
 function City({ world }) {
   const ref = useRef();
   const COUNT = 130;
-  const mat = useMemo(() => new THREE.MeshBasicMaterial({ map: getWindowTexture() }), []);
+  const mat = useOwned(() => new THREE.MeshBasicMaterial({ map: getWindowTexture() }), []);
 
   useLayoutEffect(() => {
     const rand = rng(world.levelIndex * 31 + 9);

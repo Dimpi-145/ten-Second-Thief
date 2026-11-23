@@ -2,11 +2,13 @@ import { useLayoutEffect, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { runtime } from '../../game/runtime.js';
+import { useStore } from '../../game/store.js';
 import { TILE, VOID, cellType } from '../../game/world.js';
 import { getFloorTexture, getWindowTexture } from '../../game/textures.js';
 import { Backdrop } from './Backdrop.jsx';
 import { std } from './materials.js';
 import { PROPS } from './props.jsx';
+import { useOwned } from '../useOwned.js';
 
 const unitBox = new THREE.BoxGeometry(1, 1, 1);
 const trimMat = new THREE.MeshBasicMaterial({ toneMapped: false });
@@ -105,7 +107,7 @@ function Walls({ world, cutaway }) {
 // ---- Floor: merged quads so void cells become real holes, with cliff faces around them --------
 function Floor({ world }) {
   const { theme } = world;
-  const { top, sides } = useMemo(() => {
+  const { top, sides } = useOwned(() => {
     const pos = [];
     const uv = [];
     const spos = [];
@@ -147,7 +149,7 @@ function Floor({ world }) {
     return { top: topGeo, sides: sideGeo };
   }, [world, theme]);
 
-  const floorMat = useMemo(
+  const floorMat = useOwned(
     () =>
       new THREE.MeshStandardMaterial({
         map: getFloorTexture(theme.floor.style),
@@ -156,7 +158,7 @@ function Floor({ world }) {
       }),
     [theme],
   );
-  const sideMat = useMemo(
+  const sideMat = useOwned(
     () =>
       theme.backdrop === 'city'
         ? new THREE.MeshBasicMaterial({ map: getWindowTexture(), color: '#8a93b0', side: THREE.DoubleSide })
@@ -184,6 +186,7 @@ function Lighting({ world }) {
   const ext = Math.max(hx, hz) + 3;
   const [a, b] = theme.lights;
   const power = theme.lightPower;
+  const shadows = useStore((s) => !s.lowGfx);
 
   useFrame(() => {
     if (!alarmRef.current) return;
@@ -198,7 +201,7 @@ function Lighting({ world }) {
         position={[hx * 0.5, 18, hz * 0.7]}
         intensity={theme.sun[1]}
         color={theme.sun[0]}
-        castShadow
+        castShadow={shadows}
         shadow-mapSize={[1024, 1024]}
         shadow-camera-left={-ext}
         shadow-camera-right={ext}

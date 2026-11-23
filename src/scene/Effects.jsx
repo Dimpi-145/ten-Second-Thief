@@ -4,6 +4,7 @@ import * as THREE from 'three';
 import { SMOKE_TIME } from '../game/levels.js';
 import { runtime } from '../game/runtime.js';
 import { getGlowTexture, rng } from '../game/textures.js';
+import { useOwned } from './useOwned.js';
 
 // ---- Pooled particle bursts (treasure sparkles, impacts) ------------------------------------
 const MAX = 360;
@@ -108,7 +109,7 @@ const PUFFS = 11;
 
 export function Smoke({ world }) {
   const root = useRef();
-  const mat = useMemo(
+  const mat = useOwned(
     () =>
       new THREE.MeshStandardMaterial({
         color: '#aab4e8',

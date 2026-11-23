@@ -51,6 +51,17 @@ function audio() {
   }
 }
 
+// One shared second of white noise, reused by every loop.
+let noiseBuf = null;
+function noiseBuffer(a) {
+  if (noiseBuf && noiseBuf.sampleRate === a.sampleRate) return noiseBuf;
+  const len = a.sampleRate;
+  noiseBuf = a.createBuffer(1, len, a.sampleRate);
+  const data = noiseBuf.getChannelData(0);
+  for (let i = 0; i < len; i++) data[i] = Math.random() * 2 - 1;
+  return noiseBuf;
+}
+
 function stopCurrent() {
   if (!current || !ctx) return;
   const old = current;
@@ -100,10 +111,7 @@ export const ambient = {
 
     if (recipe.noise) {
       const [ftype, freq, q, gain, rate] = recipe.noise;
-      const len = a.sampleRate * 2;
-      const buf = a.createBuffer(1, len, a.sampleRate);
-      const data = buf.getChannelData(0);
-      for (let i = 0; i < len; i++) data[i] = Math.random() * 2 - 1;
+      const buf = noiseBuffer(a);
       const src = a.createBufferSource();
       src.buffer = buf;
       src.loop = true;

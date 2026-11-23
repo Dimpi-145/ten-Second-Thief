@@ -1,4 +1,5 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
+import { useThree } from '@react-three/fiber';
 import { createWorld } from '../game/world.js';
 import { useStore } from '../game/store.js';
 import { CameraRig } from './CameraRig.jsx';
@@ -28,6 +29,27 @@ export function LevelContent({ world, cutaway = false }) {
 // One attempt at one level. Remounted (via key) on every retry so all state starts fresh.
 function Attempt({ worldIndex, level }) {
   const world = useMemo(() => createWorld(worldIndex, level), [worldIndex, level]);
+  const gl = useThree((s) => s.gl);
+  const scene = useThree((s) => s.scene);
+  const camera = useThree((s) => s.camera);
+  // Build every shader the level can need while the intro card is still up. Objects that start
+  // hidden (smoke cloud, alert markers, electric arcs) would otherwise compile theirs the first
+  // time they appear, which shows up as a freeze in the middle of a ten-second run.
+  useEffect(() => {
+    const hidden = [];
+    scene.traverse((o) => {
+      if (!o.visible) {
+        hidden.push(o);
+        o.visible = true;
+      }
+    });
+    try {
+      gl.compile(scene, camera);
+    } catch {
+      /* purely an optimisation */
+    }
+    for (const o of hidden) o.visible = false;
+  }, [gl, scene, camera]);
   return (
     <>
       <Simulation world={world} />

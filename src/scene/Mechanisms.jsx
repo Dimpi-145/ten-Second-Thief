@@ -6,6 +6,7 @@ import * as THREE from 'three';
 import { TILE } from '../game/world.js';
 import { rng } from '../game/textures.js';
 import { ghost, glow, std } from './env/materials.js';
+import { useOwned } from './useOwned.js';
 
 const box = new THREE.BoxGeometry(1, 1, 1);
 const cyl = new THREE.CylinderGeometry(1, 1, 1, 20);
@@ -18,7 +19,7 @@ const DOWN = [-Math.PI / 2, 0, 0];
 function VaultDoor({ door }) {
   const slab = useRef();
   const wheel = useRef();
-  const lamp = useMemo(() => new THREE.MeshBasicMaterial({ color: '#ff2545', toneMapped: false }), []);
+  const lamp = useOwned(() => new THREE.MeshBasicMaterial({ color: '#ff2545', toneMapped: false }), []);
   const anim = useRef(0);
   useFrame((_, dt) => {
     anim.current = Math.min(1, Math.max(0, anim.current + (door.open ? dt * 1.6 : -dt * 3)));
@@ -61,7 +62,7 @@ function VaultDoor({ door }) {
 // ---- Jump pad: launches the player across a rooftop gap ---------------------------------------
 function JumpPad({ pad }) {
   const arrows = useRef();
-  const mat = useMemo(() => new THREE.MeshBasicMaterial({ color: '#ff8a3d', toneMapped: false }), []);
+  const mat = useOwned(() => new THREE.MeshBasicMaterial({ color: '#ff8a3d', toneMapped: false }), []);
   useFrame((state) => {
     const t = state.clock.elapsedTime * 3;
     mat.color.setRGB(1, 0.45 + Math.sin(t * 2) * 0.15, 0.18);
@@ -116,7 +117,7 @@ const boltGeo = new THREE.CylinderGeometry(0.025, 0.025, 1, 4);
 
 function ZapTile({ zap }) {
   const bolts = useRef();
-  const { plate, field } = useMemo(
+  const { plate, field } = useOwned(
     () => ({
       plate: new THREE.MeshBasicMaterial({ color: '#16404a', toneMapped: false }),
       field: new THREE.MeshBasicMaterial({
@@ -177,12 +178,12 @@ function ZeroZone({ world }) {
       return { x: c.x + (rand() - 0.5) * TILE, z: c.z + (rand() - 0.5) * TILE, y: rand() * 3.2, s: 0.25 + rand() * 0.5, p: rand() * 6 };
     });
   }, [cells, COUNT, world.levelIndex]);
-  const geo = useMemo(() => {
+  const geo = useOwned(() => {
     const g = new THREE.BufferGeometry();
     g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(COUNT * 3), 3));
     return g;
   }, [COUNT]);
-  const tileMat = useMemo(
+  const tileMat = useOwned(
     () =>
       new THREE.MeshBasicMaterial({
         color: '#7d5cff', transparent: true, opacity: 0.2, depthWrite: false,

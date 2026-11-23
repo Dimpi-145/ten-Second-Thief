@@ -87,6 +87,7 @@ let state = {
   cleared: progress.cleared,
   best: progress.best,
   previews: {},
+  lowGfx: false, // set by the frame-rate watchdog when the device cannot afford real-time shadows
 };
 
 const listeners = new Set();
@@ -274,6 +275,9 @@ export const actions = {
   },
   cycleCamera() {
     actions.setCamera(CAMERA_MODES[(CAMERA_MODES.indexOf(state.cameraMode) + 1) % CAMERA_MODES.length]);
+  },
+  setLowGfx() {
+    setState({ lowGfx: true });
   },
   setPreview(id, url) {
     setState({ previews: { ...state.previews, [id]: url } });
